@@ -23,3 +23,7 @@ The Cache-Control, Expires and Pragma headers disable the caching
 The X-Content-Type-Options header disables content sniffing for the browser and provides protection from the MIME type confusion attack
 The X-Frame-Options header prevents clickjacking attack
 The X-XSS-Protection header protects the user from the cross-site scripting attack
+
+### Ref
+
+[Spring_security_doc](https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/)
