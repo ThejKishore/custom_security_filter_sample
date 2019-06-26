@@ -27,3 +27,56 @@ The X-XSS-Protection header protects the user from the cross-site scripting atta
 ### Ref
 
 [Spring_security_doc](https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/)
+
+[open_id](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
+
+[Spring_security_samples](https://github.com/spring-projects/spring-security/tree/5.1.5.RELEASE/samples)
+
+[OAuth0](https://auth0.com/docs/quickstart/backend/java-spring-security/01-authorization)
+
+
+### Dynamic multi build project 
+
+```groovy
+//settings.gradle - in root project.
+FileTree buildFiles = fileTree(rootDir) {
+	List excludes = gradle.startParameter.projectProperties.get("excludeProjects")?.split(",")
+	include '**/*.gradle'
+	exclude 'build', '**/gradle', 'settings.gradle', 'buildSrc', '/build.gradle', '.*', 'out'
+	exclude '**/grails3'
+	if(excludes) {
+		exclude excludes
+	}
+}
+
+String rootDirPath = rootDir.absolutePath + File.separator
+buildFiles.each { File buildFile ->
+
+	boolean isDefaultName = 'build.gradle'.equals(buildFile.name)
+	if(isDefaultName) {
+		String buildFilePath = buildFile.parentFile.absolutePath
+		String projectPath = buildFilePath.replace(rootDirPath, '').replace(File.separator, ':')
+		include projectPath
+	} else {
+		String projectName = buildFile.name.replace('.gradle', '');
+		String projectPath = ':' + projectName;
+		include projectPath
+		def project = findProject("${projectPath}")
+		project.name = projectName
+		project.projectDir = buildFile.parentFile
+		project.buildFileName = buildFile.name
+	}
+}
+```
+
+```groovy
+def webProjects() {
+    subprojects.findAll { subproject -> subproject.plugins.hasPlugin('war') }
+}
+
+gradle.projectsEvaluated {
+    configure(webProjects()) {
+        ...
+    }
+}
+```
