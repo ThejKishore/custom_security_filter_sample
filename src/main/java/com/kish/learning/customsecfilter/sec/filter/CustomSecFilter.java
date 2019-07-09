@@ -3,9 +3,11 @@ package com.kish.learning.customsecfilter.sec.filter;
 import io.micrometer.core.instrument.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -16,11 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -40,12 +39,13 @@ public class CustomSecFilter extends GenericFilterBean {
             //TODO create Authentication Object from the custom token header and
              SecurityContextHolder.getContext().setAuthentication(getAuthentication(oauthHeader));
             // set it to the SecurityContextHolder.getContext().setAuthentication();
-            chain.doFilter(request,response);
 
         }else {
             log.info("unauthorized access");
-            ((HttpServletResponse) response).sendError(401, "Unauthorized access");
+//            ((HttpServletResponse) response).sendError(401, "Unauthorized access");
+            SecurityContextHolder.getContext().setAuthentication(createAnonymousAuthentication(httpRequest));
         }
+        chain.doFilter(request,response);
 
     }
 
@@ -66,6 +66,16 @@ public class CustomSecFilter extends GenericFilterBean {
                 authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+    }
+
+    protected Authentication createAnonymousAuthentication(HttpServletRequest request) {
+        String key = UUID.randomUUID().toString();
+        Object principal = "anonymousUser";
+        List<GrantedAuthority> authorities = AuthorityUtils
+                .createAuthorityList("ROLE_ANONYMOUS");
+        AnonymousAuthenticationToken auth = new AnonymousAuthenticationToken(key,
+                principal, authorities);
+        return auth;
     }
 
 }

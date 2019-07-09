@@ -12,4 +12,14 @@ public class GreetingsController {
         return String.format("Hello Logged in user ");
     }
 
+    @GetMapping("/api")
+    public String greetingsApi(){
+        return String.format("Hello Logged in user ");
+    }
+
+    @GetMapping("/api2")
+    public String greetingsApi2(){
+        return String.format("Hello Logged in user ");
+    }
+
 }
