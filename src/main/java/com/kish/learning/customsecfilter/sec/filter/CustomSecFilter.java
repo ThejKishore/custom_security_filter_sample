@@ -42,6 +42,7 @@ public class CustomSecFilter extends GenericFilterBean {
 
         }else {
             log.info("unauthorized access");
+            log.info(" {} ",createAnonymousAuthentication(httpRequest));
         }
         chain.doFilter(request,response);
 
