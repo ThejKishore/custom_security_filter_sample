@@ -42,8 +42,6 @@ public class CustomSecFilter extends GenericFilterBean {
 
         }else {
             log.info("unauthorized access");
-//            ((HttpServletResponse) response).sendError(401, "Unauthorized access");
-            SecurityContextHolder.getContext().setAuthentication(createAnonymousAuthentication(httpRequest));
         }
         chain.doFilter(request,response);
 
@@ -51,18 +49,12 @@ public class CustomSecFilter extends GenericFilterBean {
 
 
     public Authentication getAuthentication(String token) {
-        /* Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
-         */
-
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.asList("user".split(",")).stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        User principal = new User("Guest_"+new Random().nextInt(100)+"_"+token, "",
+        User principal = new User("Guest_"+token, "",
                 authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
